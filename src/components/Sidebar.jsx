@@ -1,11 +1,21 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Radio, ShieldAlert, FileText, Globe, LogOut } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Radio, ShieldAlert, FileText, Globe, LogOut, Compass } from 'lucide-react';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/', { replace: true });
+  };
+
   const navItems = [
-    { label: 'Mission Control', path: '/', icon: Globe },
+    { label: 'HQ Overview', path: '/overview', icon: Globe },
     { label: 'Stations', path: '/stations', icon: Radio },
+    { label: 'Telemetry Dash', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Alerts', path: '/alerts', icon: ShieldAlert, badge: '3' },
     { label: 'Reports', path: '/reports', icon: FileText },
   ];
@@ -13,7 +23,7 @@ export default function Sidebar() {
   const linkClass = ({ isActive }) =>
     `flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
       isActive
-        ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 shadow-sm shadow-cyan-500/10'
+        ? 'bg-cyan-500/15 text-[#9DECC0] border border-[#9DECC0]/30 shadow-sm shadow-cyan-500/10'
         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
     }`;
 
@@ -29,7 +39,7 @@ export default function Sidebar() {
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
-                <NavLink key={item.path} to={item.path} end={item.path === '/'} className={linkClass}>
+                <NavLink key={item.path} to={item.path} className={linkClass}>
                   <div className="flex items-center gap-3">
                     <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
@@ -50,7 +60,7 @@ export default function Sidebar() {
           <p className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Antarctic Conditions</p>
           <div className="flex justify-between items-center text-xs">
             <span className="text-slate-400">Ext. Temp:</span>
-            <span className="font-mono text-cyan-400 font-bold">-32°C</span>
+            <span className="font-mono text-[#9DECC0] font-bold">-32°C</span>
           </div>
           <div className="flex justify-between items-center text-xs">
             <span className="text-slate-400">Wind Velocity:</span>
@@ -63,15 +73,22 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Footer / Quick Logout Button */}
-      <div className="pt-4 border-t border-slate-800/80">
+      {/* Footer / Quick Logout & Public Gateway */}
+      <div className="pt-4 border-t border-slate-800/80 space-y-1">
         <NavLink
-          to="/login"
+          to="/"
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
+        >
+          <Compass className="w-4 h-4 text-[#9DECC0]" />
+          <span>Public Gateway</span>
+        </NavLink>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors cursor-pointer text-left"
         >
           <LogOut className="w-4 h-4 text-slate-500" />
           <span>Exit Mission Control</span>
-        </NavLink>
+        </button>
       </div>
     </aside>
   );
