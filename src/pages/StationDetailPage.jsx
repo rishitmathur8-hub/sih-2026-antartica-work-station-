@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -37,6 +37,95 @@ export default function StationDetailPage() {
 
   // Normalize station ID key
   const stationKey = id ? id.toLowerCase().trim() : '';
+
+  // Maitri AI / ML live data
+  const [maitriMLData, setMaitriMLData] = useState(null);
+  const [maitriMLLive, setMaitriMLLive] = useState(false);
+  const [maitriMLLastUpdated, setMaitriMLLastUpdated] = useState(null);
+  const [maitriMLManualRefresh, setMaitriMLManualRefresh] = useState(0);
+  const [maitriMLRefreshing, setMaitriMLRefreshing] = useState(false);
+
+  // Bharati AI / ML live data
+  const [bharatiMLData, setBharatiMLData] = useState(null);
+  const [bharatiMLLive, setBharatiMLLive] = useState(false);
+  const [bharatiMLLastUpdated, setBharatiMLLastUpdated] = useState(null);
+  const [bharatiMLManualRefresh, setBharatiMLManualRefresh] = useState(0);
+  const [bharatiMLRefreshing, setBharatiMLRefreshing] = useState(false);
+
+  useEffect(() => {
+    if (stationKey !== 'maitri') {
+      setMaitriMLData(null);
+      return;
+    }
+
+    const fetchMaitriMLData = async () => {
+      setMaitriMLRefreshing(true);
+
+      try {
+        const response = await fetch(
+          'http://127.0.0.1:8000/maitri/current'
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch Maitri ML data');
+        }
+
+        const data = await response.json();
+        setMaitriMLData(data);
+        setMaitriMLLive(true);
+        setMaitriMLLastUpdated(new Date());
+      } catch (error) {
+        console.error('Maitri ML error:', error);
+        setMaitriMLLive(false);
+      } finally {
+        setMaitriMLRefreshing(false);
+      }
+    };
+
+    fetchMaitriMLData();
+
+    const interval = setInterval(fetchMaitriMLData, 10000);
+
+    return () => clearInterval(interval);
+  }, [stationKey, maitriMLManualRefresh]);
+
+  useEffect(() => {
+    if (stationKey !== 'bharati') {
+      setBharatiMLData(null);
+      return;
+    }
+
+    const fetchBharatiMLData = async () => {
+      setBharatiMLRefreshing(true);
+
+      try {
+        const response = await fetch(
+          'http://127.0.0.1:8000/bharati/current'
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch Bharati ML data');
+        }
+
+        const data = await response.json();
+        setBharatiMLData(data);
+        setBharatiMLLive(true);
+        setBharatiMLLastUpdated(new Date());
+      } catch (error) {
+        console.error('Bharati ML error:', error);
+        setBharatiMLLive(false);
+      } finally {
+        setBharatiMLRefreshing(false);
+      }
+    };
+
+    fetchBharatiMLData();
+
+    const interval = setInterval(fetchBharatiMLData, 10000);
+
+    return () => clearInterval(interval);
+  }, [stationKey, bharatiMLManualRefresh]);
+
 
   // 24-Hour Realistic Telemetry Datasets
   const maitriHourlyData = [
@@ -432,6 +521,283 @@ export default function StationDetailPage() {
           <span className="text-[10px] text-slate-400 font-mono">Active On Duty</span>
         </div>
       </div>
+
+
+      {/* Maitri AI / ML Analysis */}
+      {stationKey === 'maitri' && maitriMLData && (
+        <div className="bg-slate-900/80 border border-cyan-900/50 p-5 rounded-2xl space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-cyan-400" />
+              <span>MAITRI AI / ML ANALYSIS</span>
+            </h2>
+
+            <div className="flex items-center gap-3">
+              <span
+                className={`text-[10px] font-mono px-2 py-1 rounded-md border ${
+                  maitriMLLive
+                    ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+                    : 'text-rose-400 border-rose-500/30 bg-rose-500/10'
+                }`}
+              >
+                {maitriMLLive ? '● LIVE — NCPOR DATA' : '● OFFLINE'}
+              </span>
+
+              <span className="text-[10px] font-mono text-slate-500">
+                AUTO-REFRESH: 10s
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setMaitriMLManualRefresh((value) => value + 1)}
+                disabled={maitriMLRefreshing}
+                className={`text-[10px] font-mono px-2 py-1 rounded-md border border-cyan-500/30 text-cyan-400 bg-cyan-500/10 transition ${
+                  maitriMLRefreshing
+                    ? 'opacity-70 cursor-wait'
+                    : 'hover:bg-cyan-500/20 active:scale-95'
+                }`}
+              >
+                <span className={maitriMLRefreshing ? 'inline-block animate-spin mr-1' : 'mr-1'}>
+                  ↻
+                </span>
+                {maitriMLRefreshing ? 'REFRESHING...' : 'REFRESH NOW'}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+
+            {/* Current Temperature */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                CURRENT TEMPERATURE
+              </p>
+
+              <p className="text-xl font-bold text-slate-100 font-mono mt-2">
+                {Number(maitriMLData.current_temperature).toFixed(2)}°C
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                NCPOR Live
+              </p>
+            </div>
+
+            {/* ML Prediction */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                NEXT TEMPERATURE
+              </p>
+
+              <p className="text-xl font-bold text-cyan-400 font-mono mt-2">
+                {Number(
+                  maitriMLData.predicted_next_temperature
+                ).toFixed(2)}°C
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                ML Prediction
+              </p>
+            </div>
+
+            {/* Anomaly */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                ANOMALY STATUS
+              </p>
+
+              <p
+                className={`text-xl font-bold font-mono mt-2 ${
+                  maitriMLData.anomaly
+                    ? 'text-rose-400'
+                    : 'text-emerald-400'
+                }`}
+              >
+                {maitriMLData.anomaly ? 'ANOMALY' : 'NORMAL'}
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                Isolation Forest
+              </p>
+            </div>
+
+            {/* Severity */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                SEVERITY
+              </p>
+
+              <p
+                className={`text-xl font-bold font-mono mt-2 ${
+                  maitriMLData.severity === 'High'
+                    ? 'text-rose-400'
+                    : maitriMLData.severity === 'Medium'
+                      ? 'text-amber-400'
+                      : maitriMLData.severity === 'Low'
+                        ? 'text-yellow-400'
+                        : 'text-emerald-400'
+                }`}
+              >
+                {maitriMLData.severity}
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                Score: {maitriMLData.anomaly_score}
+              </p>
+            </div>
+
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[9px] text-slate-500 font-mono">
+              Observation: {maitriMLData.observation_time}
+            </p>
+
+            {maitriMLLastUpdated && (
+              <p className="text-[9px] text-slate-500 font-mono">
+                Last updated: {maitriMLLastUpdated.toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Bharati AI / ML Analysis */}
+      {stationKey === 'bharati' && bharatiMLData && (
+        <div className="bg-slate-900/80 border border-cyan-900/50 p-5 rounded-2xl space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-cyan-400" />
+              <span>BHARATI AI / ML ANALYSIS</span>
+            </h2>
+
+            <div className="flex items-center gap-3">
+              <span
+                className={`text-[10px] font-mono px-2 py-1 rounded-md border ${
+                  bharatiMLLive
+                    ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+                    : 'text-rose-400 border-rose-500/30 bg-rose-500/10'
+                }`}
+              >
+                {bharatiMLLive ? '● LIVE — NCPOR DATA' : '● OFFLINE'}
+              </span>
+
+              <span className="text-[10px] font-mono text-slate-500">
+                AUTO-REFRESH: 10s
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setBharatiMLManualRefresh((value) => value + 1)}
+                disabled={bharatiMLRefreshing}
+                className={`text-[10px] font-mono px-2 py-1 rounded-md border border-cyan-500/30 text-cyan-400 bg-cyan-500/10 transition ${
+                  bharatiMLRefreshing
+                    ? 'opacity-70 cursor-wait'
+                    : 'hover:bg-cyan-500/20 active:scale-95'
+                }`}
+              >
+                <span className={bharatiMLRefreshing ? 'inline-block animate-spin mr-1' : 'mr-1'}>
+                  ↻
+                </span>
+                {bharatiMLRefreshing ? 'REFRESHING...' : 'REFRESH NOW'}
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+
+            {/* Current Temperature */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                CURRENT TEMPERATURE
+              </p>
+
+              <p className="text-xl font-bold text-slate-100 font-mono mt-2">
+                {Number(bharatiMLData.current_temperature).toFixed(2)}°C
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                NCPOR Live
+              </p>
+            </div>
+
+            {/* ML Prediction */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                NEXT TEMPERATURE
+              </p>
+
+              <p className="text-xl font-bold text-cyan-400 font-mono mt-2">
+                {Number(
+                  bharatiMLData.predicted_next_temperature
+                ).toFixed(2)}°C
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                ML Prediction
+              </p>
+            </div>
+
+            {/* Anomaly */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                ANOMALY STATUS
+              </p>
+
+              <p
+                className={`text-xl font-bold font-mono mt-2 ${
+                  bharatiMLData.anomaly
+                    ? 'text-rose-400'
+                    : 'text-emerald-400'
+                }`}
+              >
+                {bharatiMLData.anomaly ? 'ANOMALY' : 'NORMAL'}
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                Isolation Forest
+              </p>
+            </div>
+
+            {/* Severity */}
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <p className="text-[10px] text-slate-400 font-mono">
+                SEVERITY
+              </p>
+
+              <p
+                className={`text-xl font-bold font-mono mt-2 ${
+                  bharatiMLData.severity === 'High'
+                    ? 'text-rose-400'
+                    : bharatiMLData.severity === 'Medium'
+                      ? 'text-amber-400'
+                      : bharatiMLData.severity === 'Low'
+                        ? 'text-yellow-400'
+                        : 'text-emerald-400'
+                }`}
+              >
+                {bharatiMLData.severity}
+              </p>
+
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                Score: {bharatiMLData.anomaly_score}
+              </p>
+            </div>
+
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-[9px] text-slate-500 font-mono">
+              Observation: {bharatiMLData.observation_time}
+            </p>
+
+            {bharatiMLLastUpdated && (
+              <p className="text-[9px] text-slate-500 font-mono">
+                Last updated: {bharatiMLLastUpdated.toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 2. Resource Monitoring Progress Bars */}
       <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-2xl space-y-4">
