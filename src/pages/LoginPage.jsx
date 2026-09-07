@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Snowflake, Lock, User, Radio, ArrowRight, ShieldCheck, Terminal, Compass, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import FloatingLines from '../components/effects/FloatingLines.jsx';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -34,10 +35,24 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen w-full bg-[#021215] text-[#E8F5F2] flex flex-col justify-between overflow-x-hidden selection:bg-[#9DECC0]/30 selection:text-[#9DECC0]">
       
-      {/* Background Atmosphere Layers */}
+      {/* FloatingLines Animated WebGL Background from React Bits */}
+      <div className="absolute inset-0 pointer-events-none z-0 opacity-75 overflow-hidden">
+        <FloatingLines
+          linesGradient={['#9DECC0', '#38bdf8', '#0284c7', '#1E3A3A']}
+          enabledWaves={['top', 'middle', 'bottom']}
+          lineCount={[8, 12, 16]}
+          lineDistance={[8, 6, 4]}
+          bendRadius={5.0}
+          bendStrength={-0.6}
+          animationSpeed={0.8}
+          interactive={true}
+          parallax={true}
+          parallaxStrength={0.2}
+          backgroundColor="#021215"
+        />
+      </div>
       <div className="absolute inset-0 bg-polar-radial pointer-events-none z-0"></div>
-      <div className="absolute inset-0 bg-polar-grid opacity-60 pointer-events-none z-0"></div>
-      <div className="absolute inset-0 bg-polar-lines opacity-20 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-polar-grid opacity-30 pointer-events-none z-0"></div>
 
       {/* Top Technical Bar / Minimalist Header */}
       <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">

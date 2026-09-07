@@ -5,6 +5,8 @@ import {
   Wifi, Compass, Activity, Server, Users, Thermometer, Terminal, Layers, Lock, Shield
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import EarthGlobeCanvas from '../components/EarthGlobeCanvas.jsx';
+import GhostFibers from '../components/effects/GhostFibers.jsx';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -79,10 +81,32 @@ export default function LandingPage() {
   return (
     <div className="relative min-h-screen w-full bg-[#021215] text-[#E8F5F2] flex flex-col justify-between overflow-x-hidden selection:bg-[#9DECC0]/30 selection:text-[#9DECC0]">
       
-      {/* Background Atmosphere Layers */}
+      {/* Background Atmosphere Layers with React Bits GhostFibers */}
+      <div className="absolute inset-0 pointer-events-none z-0 opacity-80 overflow-hidden">
+        <GhostFibers
+          lineColor="#042226"
+          glowColor="#0e4b52"
+          speed={0.15}
+          scale={2.2}
+          rotation={0}
+          rotationSpeed={0.15}
+          layers={4}
+          waveAmplitude={0.015}
+          waveFrequency={3}
+          waveSpeed={0.12}
+          layerSpeed={0.06}
+          twist={0.15}
+          lineSharpness={14}
+          glowFalloff={10}
+          glowIntensity={1.5}
+          brightness={1.8}
+          blueBoost={1.35}
+          vignette={0.7}
+          grain={0.04}
+        />
+      </div>
       <div className="absolute inset-0 bg-polar-radial pointer-events-none z-0"></div>
-      <div className="absolute inset-0 bg-polar-grid opacity-50 pointer-events-none z-0"></div>
-      <div className="absolute inset-0 bg-polar-lines opacity-15 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 bg-polar-grid opacity-40 pointer-events-none z-0"></div>
 
       {/* Top Header Navigation */}
       <header className="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
@@ -247,60 +271,11 @@ export default function LandingPage() {
               </span>
             </div>
 
-            {/* SVG Interactive Polar Map Visualizer */}
-            <div className="relative w-full h-[320px] rounded-2xl bg-[#021215] border border-[#1E3A3A]/80 flex items-center justify-center overflow-hidden">
-              
-              {/* Radar Concentric Circles */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-[280px] h-[280px] rounded-full border border-[#1E3A3A]/40 animate-spin" style={{ animationDuration: '40s' }}></div>
-                <div className="absolute w-[200px] h-[200px] rounded-full border border-[#1E3A3A]/60"></div>
-                <div className="absolute w-[120px] h-[120px] rounded-full border border-[#9DECC0]/20"></div>
-                <div className="absolute w-[40px] h-[40px] rounded-full border border-[#9DECC0]/40"></div>
-              </div>
-
-              {/* Crosshair Lines */}
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-[#1E3A3A]/40"></div>
-                <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-[#1E3A3A]/40"></div>
-              </div>
-
-              {/* Vector Station Nodes */}
-              <div className="absolute top-[32%] left-[42%] flex flex-col items-center group cursor-pointer" onClick={() => handleProtectedNavigation('/station/maitri')}>
-                <span className="w-3 h-3 rounded-full bg-[#9DECC0] shadow-[0_0_12px_#9DECC0] animate-ping"></span>
-                <span className="absolute w-2 h-2 rounded-full bg-[#9DECC0]"></span>
-                <div className="mt-2 px-2 py-1 rounded bg-[#062329]/90 border border-[#9DECC0]/40 text-[10px] font-mono text-[#9DECC0] whitespace-nowrap shadow-lg flex items-center gap-1">
-                  <span>MAITRI (70°45′S)</span>
-                  <Lock className="w-2.5 h-2.5 text-[#9DECC0]" />
-                </div>
-              </div>
-
-              <div className="absolute top-[58%] right-[28%] flex flex-col items-center group cursor-pointer" onClick={() => handleProtectedNavigation('/station/bharati')}>
-                <span className="w-3 h-3 rounded-full bg-[#9DECC0] shadow-[0_0_12px_#9DECC0]"></span>
-                <span className="w-2 h-2 rounded-full bg-[#9DECC0]"></span>
-                <div className="mt-2 px-2 py-1 rounded bg-[#062329]/90 border border-[#1E3A3A] text-[10px] font-mono text-[#E8F5F2] whitespace-nowrap shadow-lg flex items-center gap-1">
-                  <span>BHARATI (69°24′S)</span>
-                  <Lock className="w-2.5 h-2.5 text-[#7A9A95]" />
-                </div>
-              </div>
-
-              <div className="absolute bottom-[28%] left-[26%] flex flex-col items-center group cursor-pointer" onClick={() => handleProtectedNavigation('/stations')}>
-                <span className="w-2 h-2 rounded-full bg-[#7A9A95]"></span>
-                <div className="mt-1 px-2 py-0.5 rounded bg-[#062329]/80 border border-[#1E3A3A] text-[9px] font-mono text-[#7A9A95] whitespace-nowrap">
-                  DAKSHIN RELAY
-                </div>
-              </div>
-
-              {/* Connecting Vector Telemetry Signal Beam */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                <line x1="42%" y1="32%" x2="72%" y2="58%" stroke="rgba(157, 236, 192, 0.4)" strokeWidth="1.5" strokeDasharray="4 4" />
-                <line x1="42%" y1="32%" x2="26%" y2="72%" stroke="rgba(30, 58, 58, 0.8)" strokeWidth="1" />
-              </svg>
-
-              {/* Latitude Badge Overlay */}
-              <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded bg-[#041A1E]/90 border border-[#1E3A3A] text-[10px] font-mono text-[#7A9A95]">
-                POLAR SECTOR 07 // ANTARCTIC PLATEAU
-              </div>
-            </div>
+            {/* Interactive 3D Geospatial Polar Radar Globe */}
+            <EarthGlobeCanvas
+              onSelectStation={(stId) => handleProtectedNavigation(`/station/${stId}`)}
+              className="h-[380px] sm:h-[420px]"
+            />
 
             {/* Sub-status Indicator */}
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
@@ -337,12 +312,17 @@ export default function LandingPage() {
           {features.map((feat, index) => {
             const Icon = feat.icon;
             return (
-              <div key={index} className="polar-glass-card rounded-2xl p-6 space-y-4 hover:border-[#9DECC0]/40 transition-colors group">
+              <div
+                key={index}
+                onClick={() => handleProtectedNavigation('/overview')}
+                className="polar-glass-card rounded-2xl p-6 space-y-4 hover:border-[#9DECC0]/40 transition-colors group cursor-pointer"
+              >
                 <div className="w-10 h-10 rounded-xl bg-[#062329] border border-[#1E3A3A] flex items-center justify-center text-[#9DECC0] group-hover:border-[#9DECC0]/60 transition-colors">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-[#E8F5F2] font-sans">
-                  {feat.title}
+                <h3 className="text-base font-bold text-[#E8F5F2] font-sans flex items-center justify-between">
+                  <span>{feat.title}</span>
+                  <Lock className="w-3.5 h-3.5 text-[#7A9A95] opacity-60 group-hover:opacity-100 group-hover:text-[#9DECC0] transition-all" />
                 </h3>
                 <p className="text-xs text-[#94A3B8] leading-relaxed">
                   {feat.description}
@@ -375,47 +355,64 @@ export default function LandingPage() {
 
         {/* Stations Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {stationsData.map((st, idx) => (
-            <div key={idx} className="polar-glass-card rounded-2xl p-6 space-y-4 relative overflow-hidden flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between border-b border-[#1E3A3A]/60 pb-3">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#062329] text-[#9DECC0] border border-[#1E3A3A]">
-                    {st.code}
-                  </span>
-                  <span className="flex items-center gap-1.5 text-[10px] font-mono text-[#9DECC0]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#9DECC0]"></span>
-                    {st.status}
-                  </span>
+          {stationsData.map((st, idx) => {
+            const targetRoute = st.name.includes('Maitri') 
+              ? '/station/maitri' 
+              : st.name.includes('Bharati') 
+              ? '/station/bharati' 
+              : '/stations';
+            return (
+              <div
+                key={idx}
+                onClick={() => handleProtectedNavigation(targetRoute)}
+                className="polar-glass-card rounded-2xl p-6 space-y-4 relative overflow-hidden flex flex-col justify-between cursor-pointer hover:border-[#9DECC0]/40 transition-colors group"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-[#1E3A3A]/60 pb-3">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#062329] text-[#9DECC0] border border-[#1E3A3A]">
+                      {st.code}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-[10px] font-mono text-[#9DECC0]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#9DECC0]"></span>
+                      {st.status}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-bold text-[#E8F5F2] flex items-center justify-between">
+                      <span>{st.name}</span>
+                      <Lock className="w-3.5 h-3.5 text-[#7A9A95] opacity-60 group-hover:opacity-100 group-hover:text-[#9DECC0] transition-all" />
+                    </h3>
+                    <p className="text-xs font-mono text-[#7A9A95]">{st.coords}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-2 text-xs font-mono">
+                    <div className="bg-[#021215] p-2 rounded-xl border border-[#1E3A3A]">
+                      <span className="text-[10px] text-[#7A9A95] block">EXT TEMP</span>
+                      <span className="font-bold text-[#9DECC0]">{st.temp}</span>
+                    </div>
+                    <div className="bg-[#021215] p-2 rounded-xl border border-[#1E3A3A]">
+                      <span className="text-[10px] text-[#7A9A95] block">POWER LOAD</span>
+                      <span className="font-bold text-[#E8F5F2]">{st.power}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <h3 className="text-lg font-bold text-[#E8F5F2]">{st.name}</h3>
-                  <p className="text-xs font-mono text-[#7A9A95]">{st.coords}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 pt-2 text-xs font-mono">
-                  <div className="bg-[#021215] p-2 rounded-xl border border-[#1E3A3A]">
-                    <span className="text-[10px] text-[#7A9A95] block">EXT TEMP</span>
-                    <span className="font-bold text-[#9DECC0]">{st.temp}</span>
-                  </div>
-                  <div className="bg-[#021215] p-2 rounded-xl border border-[#1E3A3A]">
-                    <span className="text-[10px] text-[#7A9A95] block">POWER LOAD</span>
-                    <span className="font-bold text-[#E8F5F2]">{st.power}</span>
-                  </div>
+                <div className="pt-4 border-t border-[#1E3A3A]/60">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleProtectedNavigation(targetRoute);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#062329] group-hover:bg-[#0A3032] border border-[#1E3A3A] group-hover:border-[#9DECC0]/40 text-xs font-mono text-[#E8F5F2] group-hover:text-[#9DECC0] transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Inspect Station Telemetry</span>
+                    <Lock className="w-3.5 h-3.5 text-[#9DECC0]" />
+                  </button>
                 </div>
               </div>
-
-              <div className="pt-4 border-t border-[#1E3A3A]/60">
-                <button
-                  onClick={() => handleProtectedNavigation('/stations')}
-                  className="w-full py-2.5 px-3 rounded-xl bg-[#062329] hover:bg-[#0A3032] border border-[#1E3A3A] text-xs font-mono text-[#E8F5F2] hover:text-[#9DECC0] transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Inspect Station Telemetry</span>
-                  <Lock className="w-3.5 h-3.5 text-[#9DECC0]" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
